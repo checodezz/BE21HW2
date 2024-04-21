@@ -7,7 +7,7 @@ const hotelSchema = new mongoose.Schema(
       required: true,
     },
     category: {
-      type: [String],
+      type: String,
       enum: ["Budget", "Mid-Range", "Luxury", "Boutique", "Resort", "Other"],
     },
     location: {
@@ -34,7 +34,7 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    checkoutTime: {
+    checkOutTime: {
       type: String,
       required: true,
     },
