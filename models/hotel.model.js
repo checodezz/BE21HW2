@@ -45,7 +45,7 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       enum: ["$$ (11-30)", "$$$ (31-60)", "$$$$ (61+)", "Other"],
     },
-    reservationNeede: {
+    reservationNeeded: {
       type: Boolean,
       default: false,
     },
