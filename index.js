@@ -1,12 +1,12 @@
 const express = require("express");
 const app = express();
-// app.use(express.json())
+app.use(express.json());
 
 const Hotel = require("./models/hotel.model");
 const { initializeDatabase } = require("./db/db.connect");
 
 initializeDatabase();
-
+/* 
 const newHotel = {
   name: "New Hotel",
   category: "Mid-Range",
@@ -84,16 +84,27 @@ const newHotel3 = {
     "https://example.com/hotel2-photo2.jpg",
   ],
 };
-
+ */
 async function createHotel(newHotel) {
   try {
     const hotel = new Hotel(newHotel);
     const saveHotel = await hotel.save();
-    console.log("Hotel Saved: ", saveHotel);
+    return saveHotel;
   } catch (error) {
     throw error;
   }
 }
+
+app.post("/hotels", async (req, res) => {
+  try {
+    const savedHotel = await createHotel(req.body);
+    res
+      .status(201)
+      .json({ message: "Hotel added successfully.", hotel: savedHotel });
+  } catch (error) {
+    res.status(500).json({ error: "failed to add hotel" });
+  }
+});
 
 async function readAllHotels() {
   try {
@@ -181,19 +192,18 @@ async function hotelsByCategory(category) {
 }
 //5. Create an API with route "/hotels/category/:hotelCategory" to read all hotels by category. Test your API with Postman.
 
-app.get("/hotels/category/:hotelcategory", async (req,res) => {
+app.get("/hotels/category/:hotelcategory", async (req, res) => {
   try {
     const hotels = await hotelsByCategory(req.params.hotelcategory);
-    if(hotels.length != 0 ){
+    if (hotels.length != 0) {
       res.json(hotels);
     } else {
-      res.status(404).json({error : "hotels not found"})
+      res.status(404).json({ error: "hotels not found" });
     }
-  } catch(error){
-    res.status(500).json({error : "failed to fetch hotels"})
+  } catch (error) {
+    res.status(500).json({ error: "failed to fetch hotels" });
   }
-})
-
+});
 
 //8. Create a function to read all hotels by price range ("$$$$ (61+)"). Console all the hotels.
 
