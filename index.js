@@ -1,4 +1,7 @@
-const mongoose = require("mongoose");
+const express = require("express");
+const app = express();
+// app.use(express.json())
+
 const Hotel = require("./models/hotel.model");
 const { initializeDatabase } = require("./db/db.connect");
 
@@ -91,31 +94,56 @@ async function createHotel(newHotel) {
     throw error;
   }
 }
-// createHotel(newHotel);
-// createHotel(newHotel2);
-// createHotel(newHotel3);
 
 async function readAllHotels() {
   try {
     const hotel = await Hotel.find();
-    console.log(hotel, hotel.length);
+    return hotel;
   } catch (error) {
     throw error;
   }
 }
-// readAllHotels();
+
+////1. Create an API with route "/hotels" to read all hotels from the Database. Test your API with Postman.
+
+app.get("/hotels", async (req, res) => {
+  try {
+    const hotels = await readAllHotels();
+    if (hotels.length != 0) {
+      res.json(hotels);
+    } else {
+      res.status(404).json({ error: "hotels not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch hotels" });
+  }
+});
 
 //4. Create a function to read a hotel by its name ("Lake View"). Console the restaurant details of Lake View hotel. Use proper function and variable names.
 
 async function hotelByName(hotelName) {
   try {
     const hotel = await Hotel.findOne({ name: hotelName });
-    console.log(hotel);
+    return hotel;
   } catch (error) {
     throw error;
   }
 }
-// hotelByName("Lake View");
+
+//2. Create an API with route "/hotels/:hotelName" to read a hotel by its name. Test your API with Postman.
+
+app.get("/hotels/:hotelName", async (req, res) => {
+  try {
+    const hotel = await hotelByName(req.params.hotelName);
+    if (hotel) {
+      res.json(hotel);
+    } else {
+      res.status(404).json({ error: "hotel not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "failed to fetch hotels" });
+  }
+});
 
 //5. Create a function to read all hotels which offers parking space. Console all the hotel details.
 
@@ -146,12 +174,26 @@ async function hotelByRestaurant() {
 async function hotelsByCategory(category) {
   try {
     const hotel = await Hotel.find({ category: category });
-    console.log(hotel);
+    return hotel;
   } catch (error) {
     throw error;
   }
 }
-// hotelsByCategory("Mid-Range");
+//5. Create an API with route "/hotels/category/:hotelCategory" to read all hotels by category. Test your API with Postman.
+
+app.get("/hotels/category/:hotelcategory", async (req,res) => {
+  try {
+    const hotels = await hotelsByCategory(req.params.hotelcategory);
+    if(hotels.length != 0 ){
+      res.json(hotels);
+    } else {
+      res.status(404).json({error : "hotels not found"})
+    }
+  } catch(error){
+    res.status(500).json({error : "failed to fetch hotels"})
+  }
+})
+
 
 //8. Create a function to read all hotels by price range ("$$$$ (61+)"). Console all the hotels.
 
@@ -171,25 +213,52 @@ async function hotelByPrice(price) {
 async function hotelByRating(rating) {
   try {
     const hotel = await Hotel.find({ rating: rating });
-
-    console.log(hotel);
+    return hotel;
   } catch (error) {
     throw error;
   }
 }
 // hotelByRating("4.0");
+//4. Create an API with route "/hotels/rating/:hotelRating" to read all hotels by rating. Test your API with Postman.
+
+app.get("/hotels/rating/:hotelRating", async (req, res) => {
+  try {
+    const hotels = await hotelByRating(req.params.hotelRating);
+    if (hotels.length != 0) {
+      res.json(hotels);
+    } else {
+      res.status(404).json({ error: "Hotels not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "failed to fetch hotels." });
+  }
+});
 
 //Create a function to read a hotel by phone number ("+1299655890"). Console the hotel data.
 
 async function hotelByPhone(phno) {
   try {
     const hotel = await Hotel.findOne({ phoneNumber: phno });
-    console.log(hotel);
+    return hotel;
   } catch (error) {
     throw error;
   }
 }
-// hotelByPhone("+1299655890");
+
+//3. Create an API with route "/hotels/directory/:phoneNumber" to read a hotel by phone number. Test your API with Postman.
+
+app.get("/hotels/directory/:phoneNumber", async (req, res) => {
+  try {
+    const hotel = await hotelByPhone(req.params.phoneNumber);
+    if (hotel) {
+      res.json(hotel);
+    } else {
+      res.status(404).json({ error: "Hotel not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch hotels" });
+  }
+});
 
 //1. Create a function that accepts a hotel ID and an object with updated data, and updates the hotel data with the provided ID. Take the _id of the hotel from your database which has the name Lake View and update its checkOutTime to 11 AM. Console the updated hotel.
 
@@ -231,11 +300,43 @@ async function updateHotelPhno(phno, newPhno) {
     const updatedHotel = await Hotel.findOneAndUpdate(
       { phoneNumber: phno },
       { phoneNumber: newPhno },
-      {new : true}
+      { new: true },
     );
-    console.log(updatedHotel)
+    console.log(updatedHotel);
   } catch (error) {
     throw error;
   }
 }
-updateHotelPhno("+1299655890", "+1997687392");
+// updateHotelPhno("+1299655890", "+1997687392");
+
+// 1. Create a function deleteHotelById that accepts a hotel ID and deletes the hotel data from the db. Take any hotel id from your database and delete the records of that hotel.
+
+async function deleteHotelById(hotelId) {
+  try {
+    const deletedHotel = await Hotel.findByIdAndDelete(hotelId);
+    console.log("Deleted Hotel", deletedHotel);
+  } catch (error) {
+    throw error;
+  }
+}
+
+// deleteHotelById("662552052c38460f2637cdd3");
+
+//2. Create a function deleteHotelByPhoneNumber that accepts a hotel's phone number and deletes the hotel data from the db. Take any hotel phone number from your database and delete the records of that hotel.
+
+async function deleteHotelByPhoneNumber(hotelPhno) {
+  try {
+    const deletedHotel = await Hotel.findOneAndDelete({
+      phoneNumber: hotelPhno,
+    });
+    console.log("Deleted Hotel", deletedHotel);
+  } catch (error) {
+    throw error;
+  }
+}
+// deleteHotelByPhoneNumber("+1234567890");
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`App is listening at port ${PORT}`);
+});
