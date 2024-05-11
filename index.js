@@ -355,6 +355,35 @@ async function deleteHotelByPhoneNumber(hotelPhno) {
 }
 // deleteHotelByPhoneNumber("+1234567890");
 
+async function updateHotel(hotelId, dataToUpdate) {
+  try {
+    const updatedHotel = await Hotel.findByIdAndUpdate(hotelId, dataToUpdate, {
+      new: true,
+    });
+    return updatedHotel;
+  } catch (error) {
+    throw error;
+  }
+}
+
+app.post("/hotels/:hotelId", async (req, res) => {
+  try {
+    const updatedHotel = await updateHotel(req.params.hotelId, req.body);
+    if (updatedHotel) {
+      res
+        .status(200)
+        .json({
+          message: "Succssfully updated the hotel",
+          hotel: updatedHotel,
+        });
+    } else {
+      res.status(404).json({ error: "Hotel not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update Hotel" });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`App is listening at port ${PORT}`);
