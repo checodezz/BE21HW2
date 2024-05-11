@@ -324,11 +324,20 @@ async function updateHotelPhno(phno, newPhno) {
 async function deleteHotelById(hotelId) {
   try {
     const deletedHotel = await Hotel.findByIdAndDelete(hotelId);
-    console.log("Deleted Hotel", deletedHotel);
+    return deletedHotel;
   } catch (error) {
     throw error;
   }
 }
+
+app.delete("/hotels/:hotelId", async (req, res) => {
+  try {
+    const deletedHotel = deleteHotelById(req.params.hotelId);
+    res.status(200).json({ message: "Hotel deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "failed to fetch hotels" });
+  }
+});
 
 // deleteHotelById("662552052c38460f2637cdd3");
 
