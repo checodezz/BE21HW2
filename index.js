@@ -1,5 +1,12 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const Hotel = require("./models/hotel.model");
@@ -370,12 +377,10 @@ app.post("/hotels/:hotelId", async (req, res) => {
   try {
     const updatedHotel = await updateHotel(req.params.hotelId, req.body);
     if (updatedHotel) {
-      res
-        .status(200)
-        .json({
-          message: "Succssfully updated the hotel",
-          hotel: updatedHotel,
-        });
+      res.status(200).json({
+        message: "Succssfully updated the hotel",
+        hotel: updatedHotel,
+      });
     } else {
       res.status(404).json({ error: "Hotel not found." });
     }
